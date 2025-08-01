@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Location Example</title>
+</head>
+<body>
+  <h1>Your Location</h1>
+  <button onclick="getLocation()">Show My Location</button>
+  <p id="location">Click the button to get your location.</p>
+
+  <script>
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+      } else {
+        document.getElementById("location").textContent =
+          "Geolocation is not supported.";
+      }
+    }
+
+    function showPosition(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      document.getElementById("location").textContent =
+        Latitude: ${lat}, Longitude: ${lon};
+      check(lat, lon);
+    }
+
+    function showError(error) {
+      document.getElementById("location").textContent =
+        Error: ${error.message};
+    }
+function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
+  const R = 6371000; // Radius of Earth in meters
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c;
+
+  return distance; // in meters
+}
+
+function toRad(degrees) {
+  return degrees * Math.PI / 180;
+}
+
+    function check(lat, lon) {
+  const targetLat = 11.1771648;
+  const targetLon = 76.9523712;
+  const distance = getDistanceFromLatLonInMeters(lat, lon, targetLat, targetLon);
+
+  if (distance <= 500) { // 100 meters radius
+    console.log("✅ Within 100 meters. Attendance marked.");
+    alert("✅ Within 100 meters. Attendance marked.");
+  } else {
+    console.log("❌ Outside allowed range.");
+    alert("❌ You are outside the allowed range.");
+  }
+}
+
+  </script>
+</body>
+</html>

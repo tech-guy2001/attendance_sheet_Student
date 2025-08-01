@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mark Attendance</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+    }
+    #status {
+      margin: 10px 0;
+      color: green;
+    }
+    #error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Mark Attendance</h2>
+
+  <p id="status">Click the button to mark your attendance using your location.</p>
+  <p id="error"></p>
+
+  <form id="locationForm" method="POST" action="{% url 'mark_attendance' %}">
+    {% csrf_token %}
+    <input type="hidden" name="latitude" id="latitude">
+    <input type="hidden" name="longitude" id="longitude">
+    <button type="button" onclick="getLocationAndSubmit()">📍 Mark Attendance</button>
+  </form>
+
+  <script>
+    function getLocationAndSubmit() {
+      const status = document.getElementById("status");
+      const errorMsg = document.getElementById("error");
+      errorMsg.textContent = '';
+      status.textContent = "Getting your current location...";
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function (position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            document.getElementById("latitude").value = latitude;
+            document.getElementById("longitude").value = longitude;
+
+            status.textContent = `Location detected: Lat ${latitude.toFixed(5)}, Lon ${longitude.toFixed(5)} ✅`;
+
+            // Submit form after small delay for user clarity
+            setTimeout(() => {
+              document.getElementById("locationForm").submit();
+            }, 1000);
+          },
+          function (error) {
+            switch (error.code) {
+              case error.PERMISSION_DENIED:
+                errorMsg.textContent = "❌ Location permission denied. Please allow access.";
+                break;
+              case error.POSITION_UNAVAILABLE:
+                errorMsg.textContent = "❌ Location unavailable.";
+                break;
+              case error.TIMEOUT:
+                errorMsg.textContent = "❌ Location request timed out.";
+                break;
+              default:
+                errorMsg.textContent = "❌ An unknown error occurred.";
+            }
+            status.textContent = '';
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
+      } else {
+        errorMsg.textContent = "❌ Geolocation is not supported by this browser.";
+      }
+    }
+  </script>
+
+</body>
+</html>
