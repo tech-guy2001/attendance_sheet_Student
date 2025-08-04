@@ -155,5 +155,12 @@ def export_students_excel(request):
     return response
 
 
+def demo(request):
+    import json
+    with open("djangoseet-3d24e8c79dad.json") as f:
+        creds = json.load(f)
+    print('GOOGLE_CREDENTIALS=' + json.dumps(creds).replace('\n', '\\n'))
+
+
 
 
