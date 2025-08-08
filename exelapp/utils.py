@@ -92,10 +92,24 @@ import gspread
 from google.oauth2.service_account import Credentials
 
 # Common function to load credentials from .env
+import os
+import json
+import gspread
+from google.oauth2.service_account import Credentials
+
 def get_gspread_client():
     scope = ["https://www.googleapis.com/auth/spreadsheets"]
-    creds_info = json.loads(os.getenv("GOOGLE_CREDENTIALS"))
-    creds = Credentials.from_service_account_info(creds_info, scopes=scope)
+
+    creds_json = os.getenv("GOOGLE_CREDENTIALS")
+    if not creds_json:
+        raise ValueError("GOOGLE_CREDENTIALS not found in environment variables")
+
+    creds_dict = json.loads(creds_json)
+
+    # 🔑 Replace escaped newlines with actual newlines
+    creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
     return gspread.authorize(creds)
 
 
