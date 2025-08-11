@@ -23,12 +23,13 @@
   <p id="status">Click the button to mark your attendance using your location.</p>
   <p id="error"></p>
 
-  <form id="locationForm" method="POST" action="{% url 'mark_attendance' %}">
-    {% csrf_token %}
+  <form id="locationForm">
+   
     <input type="hidden" name="latitude" id="latitude">
     <input type="hidden" name="longitude" id="longitude">
-    <button type="button" onclick="getLocationAndSubmit()">📍 Mark Attendance</button>
+   
   </form>
+   <button type="button" onclick="getLocationAndSubmit()">📍 Mark Attendance</button>
 
   <script>
     function getLocationAndSubmit() {

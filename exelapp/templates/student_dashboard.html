@@ -91,6 +91,34 @@
         margin: 5px 0;
       }
     }
+
+        /* Full-screen loader */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 9999;
+            display: none;
+        }
+
+        /* Spinner */
+        .spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0%   { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
   </style>
 </head>
 <body>
@@ -102,20 +130,24 @@
     {% endif %}
     <h1>Welcome, {{ request.user.username }}</h1>
 
+      <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
     <div style="text-align:center;">
       <a href="{% url 'logout' %}">Logout</a>
       <a href="{% url 'export_students_excel' %}">Download Excel</a>
     </div>
 
     <h2>Mark In-Time</h2>
-    <form action="/makeintime" method="get">
+    <form    action="/makeintime" method="get">
       <label for="name">Student Name</label>
       <input type="text" name="name" value="{{ student.name }}" required />
       <input type="submit" value="Mark In Time" />
     </form>
 
     <h2>Mark Out-Time</h2>
-    <form action="/makeouttime" method="get">
+    <form action="/makeouttime"  id="myForm" method="get">
       <label for="topic">Topic</label>
       <input type="text" name="topic" placeholder="Enter Topic" required />
 
@@ -128,5 +160,14 @@
       <input type="submit" value="Mark Out Time" />
     </form>
   </div>
+
+      <script>
+        const form = document.getElementById('myForm');
+        const loader = document.getElementById('loader');
+
+        form.addEventListener('submit', function () {
+            loader.style.display = 'flex'; // Show loader
+        });
+    </script>
 </body>
 </html>

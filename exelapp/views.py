@@ -32,11 +32,13 @@ def add_student(request):
         form = StudentForm()
     return render(request, 'add_student.html', {'form': form})
 
+
 def home(request):
-    if request.user:
+    if request.user.is_authenticated:
         return redirect('dashboard')
     else:
         return render(request, 'addstudent.html')
+
 
 # add student....................................
 def add_students(request):
@@ -162,5 +164,7 @@ def demo(request):
     print('GOOGLE_CREDENTIALS=' + json.dumps(creds).replace('\n', '\\n'))
 
 
+def location(request):
+    return render(request,"location.html")
 
 
