@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path,include
 
-from.views import home,add_student,demo
+from.views import home,add_student,demo,location
 from . import views
 
 urlpatterns = [
@@ -15,6 +15,7 @@ urlpatterns = [
      path('makeouttime', views.makeouttime, name='makeouttime'),
      path('export_students_excel/', views.export_students_excel, name='export_students_excel'),
      path('demo',demo),
+      path('location',location),
 
    
 ]

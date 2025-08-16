@@ -19,6 +19,9 @@ from django.contrib.auth import login, authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import random
 
+from django.core.mail import send_mail
+from django.conf import settings
+
 def add_student(request):
     if request.method == 'POST':
         form = StudentForm(request.POST)
@@ -65,6 +68,13 @@ def add_students(request):
                 email=email
             )
         username=f'{name}{random.randint(100, 1000)}'
+        subject = 'Hello from ipcs IT'
+        message = f'wellcome to ipcs it department ... \n USERNAME : {username}  PASSWORD : {password}'
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [email]
+
+        send_mail(subject, message, email_from, recipient_list)
+
         user = User.objects.create_user(username=username, email=email, password=password)
         push_to_google_sheet_student([student.id, student.name, student.join_date,student.contact_number,student.course,student.batch,student.email])
         user.save()

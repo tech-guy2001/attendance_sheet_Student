@@ -117,6 +117,16 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# settings.py
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'        # Gmail SMTP server
+EMAIL_PORT = 587                     # TLS port
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'ipcsnandha@gmail.com'
+EMAIL_HOST_PASSWORD = 'shlh elrj rsod rvqh'
+
+
 from dotenv import load_dotenv
 load_dotenv()
 
