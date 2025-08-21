@@ -40,7 +40,7 @@ def home(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
     else:
-        return render(request, 'addstudent.html')
+        return render(request, 'login.html')
 
 
 # add student....................................
@@ -116,8 +116,9 @@ def makeintime(request):
     current_date = date.today()
     current_datetime = datetime.now()
     intime = current_datetime.strftime("%I:%M:%p")
+    print("in :",intime)
     attendance.objects.create(name=name,dates=current_date,intime=intime,email=request.user.email)
-    messages.success(request, 'Intime is marked ...')
+    messages.success(request, 'In time is marked ...')
     return redirect('dashboard')
 
 def makeouttime(request):
@@ -125,6 +126,7 @@ def makeouttime(request):
     current_date = date.today()
     current_datetime = datetime.now()
     outtime = current_datetime.strftime("%I:%M:%p")
+    print(outtime)
     staf=request.GET.get("staf")
     topic=request.GET.get("topic")
     attendance.objects.filter(email=request.user.email,dates=current_date).update(outtime=outtime,staff=staf,topic=topic)

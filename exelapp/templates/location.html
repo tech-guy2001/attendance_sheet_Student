@@ -6,7 +6,7 @@
 <body>
   <h2>Mark Attendance</h2>
   <button onclick="markAttendance()">Mark Attendance</button>
-  <p id="status"></p>
+  <p id="status"></p> 
 
   <script>
     // Allowed Location (example: office/school coordinates)
@@ -55,9 +55,9 @@ const allowedLon = 77.0176;
         document.getElementById("status").innerHTML = "Geolocation is not supported by this browser.";
       }
 
-      console.log("Your Location:", userLat, userLon);
+      //console.log("Your Location:", userLat, userLon);
 console.log("Allowed Location:", allowedLat, allowedLon);
-console.log("Distance:", distance);
+//console.log("Distance:", distance);
 
     }
   </script>

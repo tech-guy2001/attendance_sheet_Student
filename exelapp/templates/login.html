@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     body {
       margin: 0;
@@ -81,6 +83,24 @@
             display: none;
         }
 
+        a {
+      display: inline-block;
+      text-decoration: none;
+      background-color: #0056b3;
+      color: #fff;
+      padding: 10px 15px;
+      border-radius: 6px;
+      margin: 10px 5px;
+      transition: background-color 0.3s ease;
+      text-align: center;
+    }
+
+    a:hover {
+      background-color:#007bff;
+    
+    }
+
+
         /* Spinner */
         .spinner {
             border: 6px solid #f3f3f3;
@@ -118,6 +138,7 @@
       <input type="password" name="password" placeholder="Password" required>
       <input type="submit" value="Login">
     </form>
+    <a href="/add_students">New Student <i class="fa-solid fa-arrow-up-right-from-square"></i> </a>
   </div>
 
 
