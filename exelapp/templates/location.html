@@ -1,86 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Mark Attendance</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 30px;
-    }
-    #status {
-      margin: 10px 0;
-      color: green;
-    }
-    #error {
-      color: red;
-    }
-  </style>
+  <title>Location Attendance</title>
 </head>
 <body>
-
   <h2>Mark Attendance</h2>
-
-  <p id="status">Click the button to mark your attendance using your location.</p>
-  <p id="error"></p>
-
-  <form id="locationForm">
-   
-    <input type="hidden" name="latitude" id="latitude">
-    <input type="hidden" name="longitude" id="longitude">
-   
-  </form>
-   <button type="button" onclick="getLocationAndSubmit()">📍 Mark Attendance</button>
+  <button onclick="markAttendance()">Mark Attendance</button>
+  <p id="status"></p>
 
   <script>
-    function getLocationAndSubmit() {
-      const status = document.getElementById("status");
-      const errorMsg = document.getElementById("error");
-      errorMsg.textContent = '';
-      status.textContent = "Getting your current location...";
+    // Allowed Location (example: office/school coordinates)
+const allowedLat = 11.0251;
+const allowedLon = 77.0176;
 
+ 
+    const allowedRadius = 300;   // meters
+
+    // Haversine Formula - calculate distance between two points
+    function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
+      const R = 6371e3; // Radius of Earth in meters
+      const φ1 = lat1 * Math.PI/180;
+      const φ2 = lat2 * Math.PI/180;
+      const Δφ = (lat2-lat1) * Math.PI/180;
+      const Δλ = (lon2-lon1) * Math.PI/180;
+
+      const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                Math.cos(φ1) * Math.cos(φ2) *
+                Math.sin(Δλ/2) * Math.sin(Δλ/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+      return R * c; // distance in meters
+    }
+
+    function markAttendance() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          function (position) {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
+          (position) => {
+            const userLat = position.coords.latitude;
+            const userLon = position.coords.longitude;
 
-            document.getElementById("latitude").value = latitude;
-            document.getElementById("longitude").value = longitude;
+            const distance = getDistanceFromLatLonInMeters(userLat, userLon, allowedLat, allowedLon);
 
-            status.textContent = `Location detected: Lat ${latitude.toFixed(5)}, Lon ${longitude.toFixed(5)} ✅`;
-
-            // Submit form after small delay for user clarity
-            setTimeout(() => {
-              document.getElementById("locationForm").submit();
-            }, 1000);
-          },
-          function (error) {
-            switch (error.code) {
-              case error.PERMISSION_DENIED:
-                errorMsg.textContent = "❌ Location permission denied. Please allow access.";
-                break;
-              case error.POSITION_UNAVAILABLE:
-                errorMsg.textContent = "❌ Location unavailable.";
-                break;
-              case error.TIMEOUT:
-                errorMsg.textContent = "❌ Location request timed out.";
-                break;
-              default:
-                errorMsg.textContent = "❌ An unknown error occurred.";
+            if (distance <= allowedRadius) {
+              document.getElementById("status").innerHTML = "✅ Attendance Marked Successfully!";
+            } else {
+              document.getElementById("status").innerHTML = "❌ You are outside the allowed area (" + Math.round(distance) + "m away)";
             }
-            status.textContent = '';
           },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
+          (error) => {
+            document.getElementById("status").innerHTML = "Error: " + error.message;
           }
         );
       } else {
-        errorMsg.textContent = "❌ Geolocation is not supported by this browser.";
+        document.getElementById("status").innerHTML = "Geolocation is not supported by this browser.";
       }
+
+      console.log("Your Location:", userLat, userLon);
+console.log("Allowed Location:", allowedLat, allowedLon);
+console.log("Distance:", distance);
+
     }
   </script>
-
 </body>
 </html>
