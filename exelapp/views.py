@@ -177,6 +177,6 @@ def demo(request):
 
 
 def location(request):
-    return render(request,"location.html")
+    return render(request,"l.html")
 
 

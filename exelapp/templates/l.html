@@ -1,69 +1,94 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Location Example</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Office Login</title>
+  <link rel="stylesheet" href="style.css">
+
+  
 </head>
 <body>
-  <h1>Your Location</h1>
-  <button onclick="getLocation()">Show My Location</button>
-  <p id="location">Click the button to get your location.</p>
+  <div class="login-container">
+    <h2>Office Login</h2>
+    <form id="loginForm">
+  <input type="text" id="username" placeholder="Username" required />
+  <input type="password" id="password" placeholder="Password" required />
+  <button type="submit">Login</button>
+</form>
+<div id="message"></div>
+  </div>
 
-  <script>
-    function getLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
-      } else {
-        document.getElementById("location").textContent =
-          "Geolocation is not supported.";
-      }
-    }
+  <script >
+    let firstLocationError = true; // flag to show red only first time
 
-    function showPosition(position) {
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
-      document.getElementById("location").textContent =
-        Latitude: ${lat}, Longitude: ${lon};
-      check(lat, lon);
-    }
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+  e.preventDefault();
 
-    function showError(error) {
-      document.getElementById("location").textContent =
-        Error: ${error.message};
-    }
-function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
-  const R = 6371000; // Radius of Earth in meters
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+  const message = document.getElementById("message");
 
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const validUser = "admin";
+  const validPass = "1234";
 
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const distance = R * c;
-
-  return distance; // in meters
-}
-
-function toRad(degrees) {
-  return degrees * Math.PI / 180;
-}
-
-    function check(lat, lon) {
-  const targetLat = 11.1771648;
-  const targetLon = 76.9523712;
-  const distance = getDistanceFromLatLonInMeters(lat, lon, targetLat, targetLon);
-
-  if (distance <= 500) { // 100 meters radius
-    console.log("✅ Within 100 meters. Attendance marked.");
-    alert("✅ Within 100 meters. Attendance marked.");
-  } else {
-    console.log("❌ Outside allowed range.");
-    alert("❌ You are outside the allowed range.");
+  // Check login credentials
+  if (username !== validUser || password !== validPass) {
+    message.style.color = "red";
+    message.textContent = "Invalid username or password.";
+    return;
   }
-}
 
+  // Check geolocation
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+
+        const officeLat = 11.025057;   
+        const officeLng = 77.017449;
+        const allowedRadius = 0.1; // km
+
+        if (isWithinRange(latitude, longitude, officeLat, officeLng, allowedRadius)) {
+          message.style.color = "green";
+          message.textContent = "Login successful! You are inside office location.";
+        } else {
+          if (firstLocationError) {
+            message.style.color = "red";
+            message.textContent = "You are not inside the office location.";
+            firstLocationError = false; // only first time red
+          } else {
+            message.style.color = "green";
+            message.textContent = "Login successful! (Outside office)";
+          }
+        }
+      },
+      (err) => {
+        message.style.color = "red";
+        message.textContent = "Unable to get your location. Please allow location access.";
+      },
+      { enableHighAccuracy: true }
+    );
+  } else {
+    message.style.color = "red";
+    message.textContent = "Geolocation not supported by your browser.";
+  }
+});
+
+// Haversine formula to check distance
+function isWithinRange(lat1, lon1, lat2, lon2, kmRange) {
+  const R = 6371; // Earth radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const distance = R * c; 
+  return distance <= kmRange;
+}
   </script>
 </body>
 </html>
