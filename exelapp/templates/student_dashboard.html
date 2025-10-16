@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -209,5 +209,268 @@
   });
 });
     </script>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Attendance Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #eef2f3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    a {
+      display: inline-block;
+      text-decoration: none;
+      background-color: #007bff;
+      color: #fff;
+      padding: 10px 15px;
+      border-radius: 6px;
+      margin: 10px 5px;
+      transition: background-color 0.3s ease;
+      text-align: center;
+    }
+
+    a:hover {
+      background-color: #0056b3;
+    }
+
+    form {
+      margin-top: 25px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    input[type="submit"] {
+      background-color: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #218838;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+
+      a {
+        width: 100%;
+        margin: 5px 0;
+      }
+    }
+
+    /* Loader */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      z-index: 9999;
+      display: none;
+    }
+
+    .spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #3498db;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #out { display: none; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="alert alert-success alert-dismissible">
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      {% if messages %}
+        {% for message in messages %}
+          <strong>{{ message }}</strong>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <h1>Welcome, {{ request.user.username }}</h1>
+
+    <div id="loader">
+      <div class="spinner"></div>
+    </div>
+
+    <div style="text-align:center;">
+      <a href="{% url 'logout' %}">Logout</a>
+      <a href="{% url 'export_students_excel' %}">Download Excel</a>
+    </div>
+
+    <div class="in">
+      <h2>Mark In-Time</h2>
+      <form class="inForm" action="/makeintime" method="get">
+        <label for="name">Student Name</label>
+        <input type="text" name="name" value="{{ student.name }}" required />
+        <input type="submit" id="inbutton" value="Mark In Time" />
+      </form>
+    </div>
+
+    <div id="out">
+      <h2>Mark Out-Time</h2>
+      <form action="/makeouttime" id="outForm" method="get">
+        <label for="topic">Topic</label>
+        <input type="text" name="topic" placeholder="Enter Topic" required />
+
+        <label for="staf">Staff</label>
+        <select name="staf" required>
+          <option value="NANDHAKUMAR">Nandhakumar</option>
+          <option value="Aniesh">Aniesh</option>
+        </select>
+
+        <input type="submit" value="Mark Out Time" id="outbutton" />
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const loader = document.getElementById('loader');
+
+    // Allowed office location (latitude, longitude, radius in km)
+    const officeLat = 11.025057;
+    const officeLng = 77.017449;
+    const allowedRadius = 0.1; // 100 meters
+
+    // Helper: calculate distance between two lat/lng in km
+    function isWithinRange(lat1, lon1, lat2, lon2, kmRange) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a =
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const distance = R * c;
+      return distance <= kmRange;
+    }
+
+    // Common location check
+    function checkLocation(callback) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const { latitude, longitude } = pos.coords;
+            if (isWithinRange(latitude, longitude, officeLat, officeLng, allowedRadius)) {
+              callback(true);
+            } else {
+              alert("You are not inside the office location!");
+              callback(false);
+            }
+          },
+          () => {
+            alert("Unable to get your location. Please allow location access.");
+            callback(false);
+          },
+          { enableHighAccuracy: true }
+        );
+      } else {
+        alert("Geolocation not supported by your browser.");
+        callback(false);
+      }
+    }
+
+    // Handle In-Time form (AJAX)
+    $(".inForm").submit(function(e) {
+      e.preventDefault();
+      checkLocation(function(isInside) {
+        if (isInside) {
+          loader.style.display = 'flex';
+          $.ajax({
+            url: $(".inForm").attr("action"),
+            type: $(".inForm").attr("method"),
+            data: $(".inForm").serialize(),
+            success: function() {
+              loader.style.display = 'none';
+              $(".in").hide();
+              $("#out").show();
+              alert("✅ In-Time marked successfully!");
+            },
+            error: function() {
+              loader.style.display = 'none';
+              alert("Something went wrong!");
+            }
+          });
+        }
+      });
+    });
+
+    // Handle Out-Time form (normal submit)
+    $("#outForm").submit(function(e) {
+      e.preventDefault();
+      checkLocation(function(isInside) {
+        if (isInside) {
+          loader.style.display = 'flex';
+          $("#outForm")[0].submit(); // proceed to submit form
+        }
+      });
+    });
+  </script>
 </body>
 </html>
