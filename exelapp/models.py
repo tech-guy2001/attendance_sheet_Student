@@ -20,6 +20,7 @@ class Students(models.Model):
     ]
 
     name = models.CharField(max_length=100)
+    username = models.CharField(max_length=100,null=True)
     join_date = models.DateField()
     contact_number = models.CharField(max_length=15)
     course = models.CharField(max_length=100)

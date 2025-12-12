@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Students List</title>
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0077b6, #00b4d8);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #333;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 90%;
+      max-width: 1000px;
+      background-color: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    th, td {
+      text-align: center;
+      padding: 15px;
+      font-size: 16px;
+    }
+
+    th {
+      background-color: #0096c7;
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #caf0f8;
+      transform: scale(1.02);
+      transition: all 0.2s ease-in-out;
+    }
+
+    td {
+      border-bottom: 1px solid #ddd;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      table {
+        width: 100%;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      th, td {
+        padding: 10px;
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      tr {
+        margin-bottom: 15px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        padding: 10px;
+      }
+
+      td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+      }
+
+      td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        width: 45%;
+        font-weight: 600;
+        color: #0077b6;
+        text-align: left;
+      }
+
+      th {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div class="header">
+  <button> <a href="/daily_addendance">Get daily addendance</a></button>
+</div>
+  <table>
+    <tr>
+      <th>Name</th>
+      <th>Username</th>
+      <th>Join Date</th>
+      <th>Contact Number</th>
+      <th>Email</th>
+      <th>Batch</th>
+      <th>Password</th>
+      <th>Delete</th>
+    </tr>
+
+    {% for i in students %}
+    <tr>
+      <td data-label="Name">{{ i.name }}</td>
+      <td data-label="Username">{{ i.username }}</td>
+      <td data-label="Join Date">{{ i.join_date }}</td>
+      <td data-label="Contact Number">{{ i.contact_number }}</td>
+      <td data-label="Email">{{ i.email }}</td>
+      <td data-label="Batch">{{ i.batch }}</td>
+      <td data-label="Password">{{ i.password }}</td>
+      <td data-label="Password"><a href="/delete_student/{{i.id}}/">Delete</a></td>
+      <td data-label="Password"><a href="/export_students_excel_staff/{{i.email}}/">get</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+
+</body>
+</html>

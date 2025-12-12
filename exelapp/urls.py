@@ -14,8 +14,11 @@ urlpatterns = [
      path('makeintime', views.makeintime, name='makeintime'), 
      path('makeouttime', views.makeouttime, name='makeouttime'),
      path('export_students_excel/', views.export_students_excel, name='export_students_excel'),
+       path('staff', views.staff, name='staff'),
+        path('delete_student/<id>/', views.delete_student, name='delete_student'),
      path('demo',demo),
       path('location',location),
-
+      path('export_students_excel_staff/<email>/', views.export_students_excel_staff, name='export_students_excel_staff'),
+     path('daily_addendance', views.daily_addendance, name='daily_addendance'),
    
 ]

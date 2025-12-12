@@ -53,11 +53,13 @@ def add_students(request):
         batch = request.POST.get('batch')
         email=request.POST.get('email')
         password=request.POST.get('password')
+        username=f'{name}{random.randint(100, 1000)}'
         if Students.objects.filter(email=email).exists():
             messages.error(request, 'your account is already exists ...')
             return render(request, 'addstudent.html')
 
         else:
+           
             student=  Students.objects.create(
                 name=name,
                 join_date=join_date,
@@ -65,9 +67,10 @@ def add_students(request):
                 course=course,
                 batch=batch,
                 password=password,
-                email=email
+                email=email,
+                username=username
             )
-        username=f'{name}{random.randint(100, 1000)}'
+        
         subject = 'Hello from ipcs IT'
         message = f'wellcome to ipcs it department ... \n USERNAME : {username}  PASSWORD : {password}'
         email_from = settings.EMAIL_HOST_USER
@@ -178,5 +181,71 @@ def demo(request):
 
 def location(request):
     return render(request,"l.html")
+
+def staff(request):
+    s=Students.objects.all()
+    d={"students":s}
+    return render(request,"staff.html",d)
+def delete_student(request,id):
+    s=Students.objects.get(id=id)
+    user = User.objects.filter(username=s.username).first()
+    if user:
+        user.delete()
+    Students.objects.filter(id=id).delete()
+    return redirect(staff)
+
+def export_students_excel_staff(request,email):
+    # Create workbook and sheet
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Students"
+    n=Students.objects.filter(email=email).first()
+    ws.append(['Name',n.name])
+    ws.append(['Course',n.course])
+
+    # Header row
+    ws.append(['ID', 'Date', 'In Time', 'Out Time', 'Topic', 'Staff', 'Duration (hours)'])
+
+# Data rows
+    for student in attendance.objects.filter(email=email):
+        in_time_obj = datetime.strptime(student.intime, "%I:%M:%p").time()
+        out_time_obj = datetime.strptime(student.outtime, "%I:%M:%p").time()
+        in_datetime = datetime.combine(datetime.today(), in_time_obj)
+        out_datetime = datetime.combine(datetime.today(), out_time_obj)
+        # Calculate duration in hours (rounded to 2 decimal places)
+        duration = out_datetime - in_datetime
+        duration_hours = round(duration.total_seconds() / 3600, 2)
+        ws.append([student.id, student.dates.strftime("%Y-%m-%d"),student.intime,student.outtime,student.topic,student.staff,duration_hours])
+
+    # Set response
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=students.xlsx'
+
+    # Save to response
+    wb.save(response)
+    return response
+    
+
+def daily_addendance(request):
+    current_date = date.today()
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Students"
+    ws.append(['Sno','Date', 'In Time', 'Out Time', 'Topic', 'Staff'])
+    n=attendance.objects.filter(dates=current_date)
+    c=0
+    for i in n:
+        c=c+1
+        in_time_obj = datetime.strptime(i.intime, "%I:%M:%p").time()
+        out_time_obj = datetime.strptime(i.outtime, "%I:%M:%p").time()
+        in_datetime = datetime.combine(datetime.today(), in_time_obj)
+        out_datetime = datetime.combine(datetime.today(), out_time_obj)
+        ws.append([c,i.dates,i.intime,i.outtime,i.topic,i.staff])
+     # Set response
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=daily_addendance.xlsx'
+       # Save to response
+    wb.save(response)
+    return response
 
 
