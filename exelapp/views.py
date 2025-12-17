@@ -76,7 +76,7 @@ def add_students(request):
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [email]
 
-        send_mail(subject, message, email_from, recipient_list)
+        #send_mail(subject, message, email_from, recipient_list)
 
         user = User.objects.create_user(username=username, email=email, password=password)
         #push_to_google_sheet_student([student.id, student.name, student.join_date,student.contact_number,student.course,student.batch,student.email])
