@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ch)(kudm!ydd5^-h0rvja49qu02qtv)(t5wo#r7ub7o=1-yui4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -99,7 +99,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+CSRF_TRUSTED_ORIGINS = [
+    "https://resplendent-consideration-production-b76d.up.railway.app",
+]
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
