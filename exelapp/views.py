@@ -79,7 +79,7 @@ def add_students(request):
         send_mail(subject, message, email_from, recipient_list)
 
         user = User.objects.create_user(username=username, email=email, password=password)
-        push_to_google_sheet_student([student.id, student.name, student.join_date,student.contact_number,student.course,student.batch,student.email])
+        #push_to_google_sheet_student([student.id, student.name, student.join_date,student.contact_number,student.course,student.batch,student.email])
         user.save()
         login(request, user)
         messages.success(request, 'wellcome to ipcs ...')
