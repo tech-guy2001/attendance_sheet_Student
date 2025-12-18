@@ -138,7 +138,5 @@ load_dotenv()
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 14   # 14 days, adjust as needed
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # keep sessions after closing browser
-SESSION_SAVE_EVERY_REQUEST = False   
+
 

@@ -79,7 +79,7 @@ def add_students(request):
         #send_mail(subject, message, email_from, recipient_list)
 
         user = User.objects.create_user(username=username, email=email, password=password)
-        #push_to_google_sheet_student([student.id, student.name, student.join_date,student.contact_number,student.course,student.batch,student.email])
+        push_to_google_sheet_student([student.id, student.name, student.join_date,student.contact_number,student.course,student.batch,student.email])
         user.save()
         login(request, user)
         messages.success(request, 'wellcome to ipcs ...')
@@ -93,6 +93,7 @@ def login_view(request):
         password = request.POST.get('password')
 
         user = authenticate(request, username=username, password=password)
+        print("user=",user)
 
         if user is not None:
             login(request, user)
@@ -103,7 +104,6 @@ def login_view(request):
     return render(request, 'login.html')
 
 
-@login_required
 def dashboard(request):
     s=Students.objects.filter(email=request.user.email).first()
     return render(request, 'student_dashboard.html',{"student":s})
